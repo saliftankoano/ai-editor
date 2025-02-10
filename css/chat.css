@@ -1,0 +1,696 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1e1e1e;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.composer-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1e1e1e;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  margin: 8px;
+  border-radius: 4px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+}
+
+.composer-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  margin: 8px;
+  border-radius: 4px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+}
+
+.chat-input-container {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #2d2d2d;
+  border-top: 1px solid #3d3d3d;
+  margin: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.composer-input-container {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #2d2d2d;
+  border-top: 1px solid #3d3d3d;
+  margin: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.chat-input {
+  flex: 1;
+  min-height: 40px;
+  max-height: 120px;
+  padding: 0.5rem;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.composer-input {
+  flex: 1;
+  min-height: 40px;
+  max-height: 120px;
+  padding: 0.5rem;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: #ff4444;
+}
+
+.composer-input:focus {
+  outline: none;
+  border-color: #49af01;
+}
+
+.chat-message {
+  margin-bottom: 1rem;
+  max-width: 85%;
+  clear: both;
+}
+
+.composer-message {
+  margin-bottom: 1rem;
+  max-width: 85%;
+  clear: both;
+}
+
+.user-message {
+  float: right;
+}
+
+.composer-message {
+  float: left;
+}
+
+.assistant-message {
+  float: left;
+}
+
+.message-header {
+  font-size: 0.875rem;
+  color: #888;
+  margin-bottom: 0.25rem;
+}
+
+.message-content {
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: #2d2d2d;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: #e0e0e0;
+}
+
+.user-message .message-content {
+  background: #ff4444;
+  color: #ffffff;
+  border-top-right-radius: 0;
+}
+
+.assistant-message .message-content {
+  background: #2d2d2d;
+  border-top-left-radius: 0;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: #ff4444;
+  border-radius: 50%;
+  animation: typing 1s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.message-content code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+}
+
+.user-message .message-content code {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.message-content code.inline-code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+}
+
+.user-message .message-content code.inline-code {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.message-content pre.code-block {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+}
+
+.message-content pre.code-block code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+  white-space: pre;
+}
+
+.user-message .message-content code.inline-code,
+.user-message .message-content pre.code-block {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.message-content li {
+  margin-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.message-content strong {
+  font-weight: 600;
+}
+
+.message-content em {
+  font-style: italic;
+}
+
+/* Style the scrollbar */
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #3d3d3d;
+  border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #ff4444;
+}
+
+/* Style the send button */
+#send-chat-btn.ui.primary.button {
+  background-color: #ff4444;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+#send-chat-btn.ui.primary.button:hover {
+  background-color: #ff6666;
+}
+
+#send-composer-btn.ui.primary.button {
+  background-color: #49af01;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+#send-composer-btn.ui.primary.button:hover {
+  background-color: #66cc00;
+}
+
+.composer-header {
+  display: flex;
+  padding: 0.5rem 1rem;
+  background: #2d2d2d;
+  border-bottom: 1px solid #3d3d3d;
+  margin: 8px 8px 0 8px;
+  border-radius: 4px 4px 0 0;
+}
+
+.composer-header .model-selector {
+  background: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  padding: 0.5rem;
+  width: 200px;
+}
+
+.composer-header .model-selector:focus {
+  outline: none;
+  border-color: #49af01;
+}
+
+.composer-header .model-selector option {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+/* Update the composer message styling for code output */
+.composer-message .message-content pre.code-block {
+  background: rgba(73, 175, 1, 0.1);
+  border-left: 3px solid #49af01;
+}
+
+.composer-message .message-content {
+  background: #2d2d2d;
+  border-top-left-radius: 0;
+}
+
+/* Add a copy button for code blocks */
+.composer-message .code-block {
+  position: relative;
+}
+
+.composer-message .code-block:hover .copy-code {
+  opacity: 1;
+}
+
+.copy-code {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: #49af01;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.copy-code:hover {
+  background: #66cc00;
+}
+
+.suggested-change {
+  position: relative !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+}
+
+.code-change-controls {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 9999;
+  background: rgba(38, 38, 38, 0.95);
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.code-change-controls .change-type {
+  font-size: 13px;
+  font-weight: 500;
+  color: #e0e0e0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.code-change-controls .accept-change,
+.code-change-controls .reject-change {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.code-change-controls .accept-change {
+  color: #49af01;
+}
+
+.code-change-controls .reject-change {
+  color: #ff4444;
+}
+
+.code-change-controls .accept-change:hover {
+  background: rgba(73, 175, 1, 0.2);
+  transform: translateY(-1px);
+}
+
+.code-change-controls .reject-change:hover {
+  background: rgba(255, 68, 68, 0.2);
+  transform: translateY(-1px);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+.code-change-controls[style*="flex"] {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Add these new styles for different change types */
+.suggested-change.insert-change {
+  background-color: rgba(73, 175, 1, 0.1) !important;
+  border-left: 3px solid #49af01 !important;
+}
+
+.suggested-change.modify-change {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+  border-left: 3px solid #ffc107 !important;
+}
+
+.suggested-change.remove-change {
+  background-color: rgba(255, 68, 68, 0.1) !important;
+  border-left: 3px solid #ff4444 !important;
+  text-decoration: line-through !important;
+  opacity: 0.7 !important;
+}
+
+.change-type {
+  color: #e0e0e0;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.insert-label {
+  background-color: rgba(73, 175, 1, 0.2);
+  color: #49af01;
+}
+
+.modify-label {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.remove-label {
+  background-color: rgba(255, 68, 68, 0.2);
+  color: #ff4444;
+}
+
+/* Add these styles to improve the layout appearance */
+
+/* Improve tab styling */
+.lm_tab {
+  background: #2d2d2d !important;
+  border: none !important;
+  color: #888 !important;
+}
+
+.lm_tab.lm_active {
+  background: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+.lm_header {
+  background: #2d2d2d !important;
+  border-bottom: 1px solid #3d3d3d !important;
+}
+
+/* Improve splitter styling */
+.lm_splitter {
+  background: #3d3d3d !important;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+}
+
+.lm_splitter:hover {
+  opacity: 1;
+  background: #49af01 !important;
+}
+
+/* Improve header styling */
+.lm_header .lm_tab {
+  padding: 4px 12px;
+  margin-top: 3px;
+  font-size: 13px;
+  border-radius: 3px 3px 0 0;
+}
+
+.lm_header .lm_tab.lm_active {
+  padding-bottom: 5px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid #49af01 !important;
+}
+
+/* Improve content area styling */
+.lm_content {
+  background: #1e1e1e !important;
+  border: none !important;
+}
+
+/* Add subtle shadows to create depth */
+.lm_item {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Improve button styling */
+#send-chat-btn,
+#send-composer-btn {
+  margin: 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Update the change highlighting styles */
+.suggested-change {
+  position: relative !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+}
+
+.suggested-change.insert-change {
+  background-color: rgba(73, 175, 1, 0.1) !important;
+  border-left: 3px solid #49af01 !important;
+}
+
+.suggested-change.remove-change {
+  background-color: rgba(255, 68, 68, 0.1) !important;
+  border-left: 3px solid #ff4444 !important;
+  text-decoration: line-through !important;
+  opacity: 0.7 !important;
+}
+
+/* Add line number decoration styles */
+.line-decoration {
+  width: 5px !important;
+  margin-left: 3px;
+}
+
+.insert-decoration {
+  border-left: 2px solid #49af01;
+}
+
+.remove-decoration {
+  border-left: 2px solid #ff4444;
+}
+
+/* Add glyph margin indicators */
+.change-glyph {
+  width: 4px;
+  margin-left: 3px;
+}
+
+.insert-glyph::after {
+  content: "+";
+  color: #49af01;
+}
+
+.remove-glyph::after {
+  content: "-";
+  color: #ff4444;
+}
+
+/* Add line number indicators */
+.line-indicator {
+  position: absolute;
+  left: -20px;
+  color: #666;
+  user-select: none;
+  z-index: 5;
+}
+
+.insert-change::before,
+.remove-change::before {
+  position: absolute;
+  left: 4px;
+  color: inherit;
+  opacity: 1 !important;
+  z-index: 5;
+}
+
+.insert-change::before {
+  content: "+" !important;
+  color: #49af01 !important;
+}
+
+.remove-change::before {
+  content: "-" !important;
+  color: #ff4444 !important;
+}
+
+/* Improve the Monaco editor containers in messages */
+.message .monaco-editor {
+  margin: 10px 0;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #3d3d3d;
+}
+
+.message .monaco-editor .margin {
+  background: #1e1e1e !important;
+}
+
+/* Ensure the glyph margin indicators are visible */
+.monaco-editor .margin-view-overlays .cgmr {
+  width: 5px !important;
+  margin-left: 5px;
+}
+
+.change-glyph {
+  width: 5px !important;
+  margin-left: 5px !important;
+}
+
+/* Update message styling */
+.message {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+  white-space: pre-wrap;
+  color: #e0e0e0;
+}
+
+.message.user {
+  background: #1e1e1e;
+  border-color: #49af01;
+}
+
+.message.assistant {
+  background: #1e1e1e;
+  border-color: #3d3d3d;
+}
+
+/* Style code blocks in messages */
+.message pre {
+  background: #1e1e1e;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  border: 1px solid #3d3d3d;
+}
+
+.message code {
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Improve the code container styling */
+.code-container {
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+/* Add styling for markdown content */
+.message p {
+  margin: 0.5em 0;
+  color: #e0e0e0;
+}
+
+.message ul,
+.message ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+  color: #e0e0e0;
+}
+
+.message li {
+  margin: 0.25em 0;
+}
+
+.message strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.message em {
+  color: #e0e0e0;
+  font-style: italic;
+}
