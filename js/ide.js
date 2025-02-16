@@ -1,17 +1,18 @@
 import { IS_PUTER } from "./puter.js";
-
+import {
+  JUDGE0_API_KEY,
+  GROQ_KEY,
+  GROQ_ENDPOINT,
+  CE_BASE_URL,
+  EXTRA_CE_BASE_URL,
+} from "./env.js";
 // Load environment variables with fallbacks
-const API_KEY = import.meta.env.VITE_JUDGE0_API_KEY || "";
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
-const GROQ_API_ENDPOINT =
-  import.meta.env.VITE_GROQ_API_ENDPOINT ||
-  "https://api.groq.com/openai/v1/chat/completions";
+const API_KEY = JUDGE0_API_KEY;
+const GROQ_API_KEY = GROQ_KEY;
+const GROQ_API_ENDPOINT = GROQ_ENDPOINT;
 
-const AUTHENTICATED_CE_BASE_URL =
-  import.meta.env.VITE_JUDGE0_CE_BASE_URL || "https://judge0-ce.p.sulu.sh";
-const AUTHENTICATED_EXTRA_CE_BASE_URL =
-  import.meta.env.VITE_JUDGE0_EXTRA_CE_BASE_URL ||
-  "https://judge0-extra-ce.p.sulu.sh";
+const AUTHENTICATED_CE_BASE_URL = CE_BASE_URL;
+const AUTHENTICATED_EXTRA_CE_BASE_URL = EXTRA_CE_BASE_URL;
 
 // Log environment status (for debugging)
 console.log("Environment Variables Status:", {
@@ -1150,7 +1151,6 @@ function showTypingIndicator($chatMessages) {
   return $typingIndicator;
 }
 
-// Update the handleComposerCodeChange function
 function handleComposerCodeChange(newCode) {
   const model = sourceEditor.getModel();
   const changeId = Date.now().toString();
@@ -1192,7 +1192,6 @@ function handleComposerCodeChange(newCode) {
   };
 }
 
-// Update the acceptChange and rejectChange functions to handle the new positioning
 function acceptChange() {
   if (!sourceEditor._currentChange) return;
 
@@ -1505,23 +1504,6 @@ function analyzeCodeChange(model, startLine, newCode) {
   };
 }
 
-// Update these constants for better autocomplete behavior
-const COMPLETION_TRIGGER_CHARACTERS = [
-  ".",
-  "(",
-  "{",
-  "[",
-  '"',
-  "'",
-  " ",
-  "\n",
-  "_",
-  ":",
-  ">",
-];
-const MAX_COMPLETIONS = 8;
-
-// Add these constants near the top with other constants
 const INLINE_SUGGESTION_DELAY = 100; // ms delay before showing inline suggestions
 let lastInlineRequest = null;
 

@@ -1,4 +1,4 @@
 .env
 .env.local
-
+/js/env.js
 node_modules
