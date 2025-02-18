@@ -77,7 +77,7 @@ const USER_NAME = "You";
 // Add these constants for Groq models
 const GROQ_MODELS = {
   "mixtral-8x7b-32768": "Mixtral 8x7B",
-  "llama2-70b-4096": "LLaMA2 70B",
+  "llama-3.3-70b-versatile": "LLaMA3.3 70B",
   "gemma2-9b-it": "Gemma 9B",
 };
 
@@ -917,7 +917,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   };
 
-  // Add these lines near the top of the file, after the variable declarations
   window.acceptChange = acceptChange;
   window.rejectChange = rejectChange;
 });
@@ -1155,7 +1154,6 @@ function handleComposerCodeChange(newCode) {
   const model = sourceEditor.getModel();
   const changeId = Date.now().toString();
 
-  // Store original code
   const originalCode = model.getValue();
 
   // Analyze changes and get decorations
@@ -1504,165 +1502,155 @@ function analyzeCodeChange(model, startLine, newCode) {
   };
 }
 
-const INLINE_SUGGESTION_DELAY = 100; // ms delay before showing inline suggestions
-let lastInlineRequest = null;
+const TYPING_IDLE_DELAY = 1000; // 1 second delay
+let suggestionTimer = null;
 
 function setupAutoComplete(editor) {
   // Register the inline suggestions provider
   monaco.languages.registerInlineCompletionsProvider("*", {
     provideInlineCompletions: async (model, position, context, token) => {
       try {
-        // Don't show suggestions if we're not at the end of a line/word
+        // Only process if we're at the end of a line
         const lineContent = model.getLineContent(position.lineNumber);
         if (position.column < lineContent.length) {
           return { items: [] };
         }
 
-        // Debounce suggestions
-        if (lastInlineRequest) {
-          clearTimeout(lastInlineRequest);
-        }
+        const previousLines = model
+          .getLinesContent()
+          .slice(0, position.lineNumber - 1);
+        const nextLines = model
+          .getLinesContent()
+          .slice(position.lineNumber, position.lineNumber + 2);
+        const currentLanguage = $selectLanguage.find(":selected").text();
 
-        const result = await new Promise((resolve) => {
-          lastInlineRequest = setTimeout(async () => {
-            const wordInfo = model.getWordUntilPosition(position);
-            const prefix = lineContent.substring(0, position.column - 1);
-
-            // Get context
-            const previousLines = model
-              .getLinesContent()
-              .slice(
-                Math.max(0, position.lineNumber - 3),
-                position.lineNumber - 1
-              );
-            const nextLines = model
-              .getLinesContent()
-              .slice(position.lineNumber, position.lineNumber + 2);
-
-            const currentLanguage = $selectLanguage.find(":selected").text();
-
-            const response = await fetch(GROQ_API_ENDPOINT, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${GROQ_API_KEY}`,
+        const response = await fetch(GROQ_API_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${GROQ_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              {
+                role: "system",
+                content: `You are a code completion assistant. Return ONLY a JSON array with a SINGLE completion item containing:
+                - text: The predicted completion text (only the part that should be added)
+                
+                The completion should:
+                1. Be a natural continuation of the current code
+                2. Consider the surrounding code context and use relvant naming conventions
+                3. Complete the current line or add a new line if appropriate
+                4. If the user is typing a function, complete the function signature and body.
+                
+                You do not always need to provide a completion. Do so only if it makes sense.
+                Do not use general naming conventions like "myFunction", use the ones that are most relevant to the code.
+                Keep suggestions concise and relevant. Return ONLY the JSON array.`,
               },
-              body: JSON.stringify({
-                model: "mixtral-8x7b-32768",
-                messages: [
-                  {
-                    role: "system",
-                    content: `You are an inline code completion assistant. Return ONLY a JSON array with a SINGLE completion item containing:
-                    - text: The suggested completion text (only the part that should be added)
-                    - description: A very brief description of what this completion does
-                    
-                    The completion should:
-                    1. Be a natural continuation of the current code
-                    2. Be contextually relevant
-                    3. Complete the current line or add a new line if appropriate
-                    4. Consider the surrounding code context
-                    
-                    Keep suggestions concise and relevant. Return ONLY the JSON array.`,
-                  },
-                  {
-                    role: "user",
-                    content: `Language: ${currentLanguage}
-                    Previous lines: ${previousLines.join("\n")}
-                    Current line: ${lineContent}
-                    Next lines: ${nextLines.join("\n")}
-                    Cursor position: Column ${position.column}`,
-                  },
-                ],
-                temperature: 0.1,
-                max_tokens: 150,
-              }),
-            });
-
-            const data = await response.json();
-            const suggestion = JSON.parse(data.choices[0].message.content)[0];
-
-            resolve({
-              items: [
-                {
-                  insertText: suggestion.text,
-                  range: {
-                    startLineNumber: position.lineNumber,
-                    startColumn: position.column,
-                    endLineNumber: position.lineNumber,
-                    endColumn: position.column,
-                  },
-                  command: {
-                    id: "editor.action.inlineSuggest.commit",
-                    arguments: [],
-                  },
-                },
-              ],
-              enableForwardStability: true,
-            });
-          }, INLINE_SUGGESTION_DELAY);
+              {
+                role: "user",
+                content: `Language: ${currentLanguage}
+                Previous lines: ${previousLines.join("\n")}
+                Current line: ${lineContent}
+                Next lines: ${nextLines.join("\n")}
+                Cursor position: Column ${position.column}`,
+              },
+            ],
+            temperature: 0.7,
+            max_tokens: 1000,
+          }),
         });
 
-        return result;
+        const data = await response.json();
+        const suggestion = JSON.parse(data.choices[0].message.content)[0];
+        // console.log("Language", currentLanguage);
+        // console.log("Previous lines", previousLines);
+        // console.log("Current line", lineContent);
+        // console.log("Next lines", nextLines);
+        // console.log("Position", position);
+        // console.log("Suggestion", suggestion);
+        return {
+          items: [
+            {
+              insertText: suggestion.text,
+              range: {
+                startLineNumber: position.lineNumber,
+                startColumn: position.column,
+                endLineNumber: position.lineNumber,
+                endColumn: position.column,
+              },
+              command: {
+                id: "editor.action.inlineSuggest.commit",
+                arguments: [],
+              },
+            },
+          ],
+          enableForwardStability: true,
+        };
       } catch (error) {
         console.error("Inline completion error:", error);
         return { items: [] };
       }
     },
+    freeInlineCompletions: (completions) => {
+      // Cleanup method required by Monaco
+    },
   });
 
-  // Update editor options specifically for inline suggestions
+  // Add debounced typing handler
+  editor.onDidChangeModelContent((event) => {
+    // Only trigger for actual text additions
+    const hasTextAddition = event.changes.some(
+      (change) =>
+        change.text.length > change.rangeLength && // More text added than removed
+        !change.text.match(/^\s+$/) // Not just whitespace
+    );
+
+    if (!hasTextAddition) {
+      return;
+    }
+
+    // Clear any existing timer
+    if (suggestionTimer) {
+      clearTimeout(suggestionTimer);
+    }
+
+    // Set new timer
+    suggestionTimer = setTimeout(() => {
+      editor.trigger("suggest", "editor.action.inlineSuggest.trigger", {});
+    }, TYPING_IDLE_DELAY);
+  });
+
+  // Update editor options
   editor.updateOptions({
     inlineSuggest: {
       enabled: true,
       mode: "prefix",
       showToolbar: "always",
     },
-    suggest: {
-      preview: true,
-      previewMode: "prefix",
-      showInlineDetails: true,
-      showMethods: true,
-      showFunctions: true,
-      showVariables: true,
-      showConstants: true,
-      showConstructors: true,
-      showFields: true,
-      showProperties: true,
-      showEvents: true,
-      showOperators: true,
-      showUnits: true,
-      showValues: true,
-      showWords: true,
-      showColors: true,
-      showFiles: true,
-      showReferences: true,
-      showFolders: true,
-      showTypeParameters: true,
-      showSnippets: true,
-    },
+    // Disable automatic suggestions
     quickSuggestions: {
-      other: "inline",
-      comments: "inline",
-      strings: "inline",
+      other: false,
+      comments: false,
+      strings: false,
     },
-    parameterHints: {
-      enabled: true,
-      cycle: true,
-    },
-    tabCompletion: "on",
-    acceptSuggestionOnEnter: "off",
+    // Only show suggestions when explicitly triggered
+    suggestOnTriggerCharacters: false,
   });
 
-  // Add keyboard shortcuts
-  editor.addCommand(monaco.KeyCode.Tab, () => {
-    editor.trigger("keyboard", "editor.action.inlineSuggest.commit", {});
-  });
+  // ... rest of your keyboard shortcuts ...
+}
 
-  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.RightArrow, () => {
-    editor.trigger(
-      "keyboard",
-      "editor.action.inlineSuggest.acceptNextWord",
-      {}
-    );
-  });
+function appendVoiceMessage($messages, content, type) {
+  const icon =
+    type === "user" ? "user" : type === "assistant" ? "robot" : "info circle";
+  const $message = $(`
+    <div class="voice-message ${type}">
+      <i class="${icon} icon"></i>
+      <div class="content">${content}</div>
+    </div>
+  `);
+  $messages.append($message);
+  $messages.scrollTop($messages[0].scrollHeight);
 }

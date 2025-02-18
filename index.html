@@ -88,6 +88,151 @@
 
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
+
+    <!-- Load our scripts with defer -->
+    <script>
+        console.log("Testing console output");
+    </script>
+    
+    <!-- Load agent.mjs first and expose it globally -->
+    <script type="module">
+        import { createAgent, stopAgent } from "./js/agent.mjs";
+        // Expose agent functions globally
+        window.mentorAgent = { createAgent, stopAgent };
+        console.log("Agent functions exposed:", window.mentorAgent);
+    </script>
+
+    <!-- Load mentor UI directly -->
+    <script>
+        // Wait for agent to be available
+        function waitForAgent() {
+            return new Promise((resolve) => {
+                if (window.mentorAgent) {
+                    resolve(window.mentorAgent);
+                } else {
+                    const check = () => {
+                        if (window.mentorAgent) {
+                            resolve(window.mentorAgent);
+                        } else {
+                            setTimeout(check, 100);
+                        }
+                    };
+                    check();
+                }
+            });
+        }
+
+        const DEBUG = true;
+        function debug(...args) {
+            if (DEBUG) console.log("[Mentor UI]", ...args);
+        }
+
+        // Handle UI interactions
+        window.mentorSession = null;
+
+        async function startMentorSession() {
+            try {
+                debug("Starting mentor session...");
+                const agent = await waitForAgent();
+                const session = await agent.createAgent();
+                debug("Agent created successfully:", session);
+                return session;
+            } catch (error) {
+                console.error("Error creating agent:", error);
+                throw error;
+            }
+        }
+
+        async function endMentorSession(session) {
+            if (session) {
+                try {
+                    debug("Ending mentor session...");
+                    const agent = await waitForAgent();
+                    await agent.stopAgent();
+                    debug("Session ended successfully");
+                } catch (error) {
+                    console.error("Error stopping session:", error);
+                    throw error;
+                }
+            }
+        }
+
+        async function toggleMentorSession() {
+            debug("Toggle mentor session called");
+            const fab = document.querySelector("#mentor-fab button");
+            const statusText = document.querySelector(".mentor-status");
+
+            if (!window.mentorSession) {
+                debug("Attempting to start session...");
+                fab.classList.add("active");
+                statusText.textContent = "Starting mentoring session...";
+
+                try {
+                    window.mentorSession = await startMentorSession();
+                    statusText.textContent = "Mentoring session active";
+                    debug("Mentor session started successfully:", window.mentorSession);
+                } catch (error) {
+                    console.error("Failed to start mentor session:", error);
+                    fab.classList.remove("active");
+                    statusText.textContent = "Failed to start session. Try again.";
+                    window.mentorSession = null;
+                }
+            } else {
+                debug("Attempting to end session...");
+                statusText.textContent = "Ending session...";
+
+                try {
+                    await endMentorSession(window.mentorSession);
+                    window.mentorSession = null;
+                    fab.classList.remove("active");
+                    statusText.textContent = "Click to start mentoring session";
+                    debug("Mentor session ended successfully");
+                } catch (error) {
+                    console.error("Failed to end mentor session:", error);
+                    statusText.textContent = "Error ending session. Try again.";
+                }
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener("DOMContentLoaded", () => {
+            debug("Initializing FAB...");
+            const fab = document.querySelector("#mentor-fab button");
+            
+            if (fab) {
+                debug("Found FAB, adding click handler");
+                fab.addEventListener("click", async (e) => {
+                    debug("FAB clicked!");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Visual feedback
+                    fab.style.opacity = "0.7";
+                    setTimeout(() => fab.style.opacity = "1", 200);
+                    
+                    try {
+                        await toggleMentorSession();
+                    } catch (error) {
+                        console.error("Error in click handler:", error);
+                    }
+                });
+                debug("Click handler added");
+            } else {
+                console.error("FAB not found");
+            }
+        });
+
+        // Export for debugging
+        window.debugMentorUI = {
+            toggleMentorSession,
+            debug,
+            getState: () => ({
+                mentorSession: window.mentorSession,
+                fab: document.querySelector("#mentor-fab button"),
+                statusText: document.querySelector(".mentor-status")
+            })
+        };
+    </script>
 </head>
 
 <body>
@@ -188,6 +333,14 @@
         <span class="change-type modify-label">Modified</span>
         <button class="accept-change" onclick="window.acceptChange()">✓</button>
         <button class="reject-change" onclick="window.rejectChange()">✗</button>
+    </div>
+
+    <!-- Replace the existing FAB HTML -->
+    <div id="mentor-fab" class="mentor-fab">
+        <button class="ui circular icon button massive" type="button">
+            <i class="microphone icon"></i>
+        </button>
+        <div class="mentor-status">Click to start recording</div>
     </div>
 </body>
 </html>
